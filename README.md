@@ -44,9 +44,26 @@ The main AI agent configuration is available here:
 - Reopen a previously completed task.
 - Handle requests involving nonexistent task IDs.
 
-## Screenshots
 
-Project workflow diagrams and example AI agent interactions are available in the [screenshots folder](screenshots/).
+## System Overview & Results
+
+### AI Agent Configuration
+![AI Agent Configuration](screenshots/ai-agent-configuration.png)
+
+### Employee Lookup
+![Employee Lookup](screenshots/agent-employee-lookup-english.png)
+
+### Task Status Management
+![Task Status Management](screenshots/agent-task-status-lifecycle.png)
+
+### Deadline Validation
+![Deadline Validation](screenshots/agent-deadline-validation-ukrainian.png)
+
+### Task Status Update Workflow
+![Task Status Update Workflow](screenshots/task-status-update-workflow.png)
+
+Additional workflow diagrams and test results are available in the [screenshots folder](screenshots/).
+  
 
 ## Project Structure
 
