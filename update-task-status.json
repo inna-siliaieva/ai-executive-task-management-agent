@@ -1,0 +1,366 @@
+{
+  "name": "Executive Agent - Update Task Status Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "task_id"
+            },
+            {
+              "name": "status"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -64
+      ],
+      "id": "444d2128-1a8d-4fb9-8786-4136cc3a9b4f",
+      "name": "Receive Task Status Update Request"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "G4kniJXmg1kDeGHV",
+          "mode": "list",
+          "cachedResultName": "executive_agent_tasks"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "task_id",
+              "keyValue": "={{ $json.task_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        -64
+      ],
+      "id": "25a5c717-ea82-4a95-b3f3-fffd103383de",
+      "name": "Find Task in Database",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "G4kniJXmg1kDeGHV",
+          "mode": "list",
+          "cachedResultName": "executive_agent_tasks"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $json.id }}\n"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{ $('Receive Task Status Update Request').first().json.status }}",
+            "completed_at": "={{ $('Receive Task Status Update Request').first().json.status === 'Completed' ? $now.toISO() : null }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "task_id",
+              "displayName": "task_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "assigned_employee_id",
+              "displayName": "assigned_employee_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "due_date",
+              "displayName": "due_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "completed_at",
+              "displayName": "completed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_by",
+              "displayName": "created_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        -64
+      ],
+      "id": "1db0add7-3aa6-446b-8a55-b9894cc5e1a0",
+      "name": "Update Task Status in Database",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "721f7bd5-def5-482c-8ab7-bb2178852e03",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "daa59ec0-04b5-4f07-aa74-e042611eedf2",
+              "name": "task_id",
+              "value": "={{ $json.task_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e345e6f4-59c5-403a-b55d-0dffd4c2143c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "1706d9b7-6e4c-46dd-8730-df8344566ed3",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "5b66c638-e284-4a7d-8896-a0cf17060082",
+              "name": "message",
+              "value": "={{ `Task ${$json.task_id} status updated to ${$json.status} successfully.` }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        704,
+        -64
+      ],
+      "id": "9c589a62-6f2e-4525-8d75-c3ecfc8cde3b",
+      "name": "Prepare Task Status Update Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d9dcfcf0-c918-4e52-b814-1ecb668d7501",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "a8d1e501-ebf5-4f14-9625-7d0a49ab4a73",
+      "name": "Check Task Exists"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "578abc1f-1fad-473b-ae27-05a9331ef9b6",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "aa8b2049-ec16-4ac8-a54b-28e5d5f71cfb",
+              "name": "task_id",
+              "value": "={{ $('Receive Task Status Update Request').first().json.task_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7d8370d0-7bdd-416d-872c-55542953310d",
+              "name": "message",
+              "value": "={{ 'Task ' + $('Receive Task Status Update Request').first().json.task_id + ' was not found. No changes were made.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        480,
+        160
+      ],
+      "id": "2a00f363-e7da-40ab-a35c-d3ab6998683c",
+      "name": "Prepare Task Not Found Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Task Status Update Request": {
+      "main": [
+        [
+          {
+            "node": "Find Task in Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Task in Database": {
+      "main": [
+        [
+          {
+            "node": "Check Task Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Task Status in Database": {
+      "main": [
+        [
+          {
+            "node": "Prepare Task Status Update Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Task Exists": {
+      "main": [
+        [
+          {
+            "node": "Update Task Status in Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Task Not Found Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7bb4a084-3ea9-4b3d-8f62-7c010d4406be",
+  "nodeGroups": [],
+  "id": "9mbxdC4PxExVtcZh",
+  "tags": []
+}

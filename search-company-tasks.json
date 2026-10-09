@@ -1,0 +1,101 @@
+{
+  "name": "Executive Agent - Search Tasks Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "employee_id"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "priority"
+            },
+            {
+              "name": "overdue_only",
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        -80
+      ],
+      "id": "43dc0f4c-0259-4126-a012-397847cb40c3",
+      "name": "Receive Task Search Request"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "G4kniJXmg1kDeGHV",
+          "mode": "list",
+          "cachedResultName": "executive_agent_tasks"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -80
+      ],
+      "id": "00b599c1-5c39-477f-9b54-e7df6d9d8d98",
+      "name": "Retrieve Tasks from Database"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst input = $('Receive Task Search Request').first().json;\n\nconst employeeId = input.employee_id || '';\nconst status = input.status || '';\nconst priority = input.priority || '';\nconst overdueOnly = input.overdue_only === true;\n\nconst now = new Date();\n\nconst tasks = $input.all()\n  .map(item => item.json)\n  .filter(task => {\n    if (employeeId && task.assigned_employee_id !== employeeId) return false;\n    if (status && task.status !== status) return false;\n    if (priority && task.priority !== priority) return false;\n\n    if (overdueOnly) {\n      const dueDate = new Date(task.due_date);\n      if (\n        !task.due_date ||\n        Number.isNaN(dueDate.getTime()) ||\n        dueDate >= now ||\n        ['Completed', 'Cancelled'].includes(task.status)\n      ) {\n        return false;\n      }\n    }\n\n    return true;\n  });\n\nreturn [{\n  json: {\n    success: true,\n    total: tasks.length,\n    filters: {\n      employee_id: employeeId || null,\n      status: status || null,\n      priority: priority || null,\n      overdue_only: overdueOnly\n    },\n    tasks\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "be2fc90e-ddf0-48df-ac83-3d373408faad",
+      "name": "Filter and Format Task Results"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Task Search Request": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Tasks from Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Tasks from Database": {
+      "main": [
+        [
+          {
+            "node": "Filter and Format Task Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "92c3d86d-8bdc-4a33-86e2-8abf4cc3ea8f",
+  "nodeGroups": [],
+  "id": "9TIf7EGXfgrxGnKG",
+  "tags": []
+}

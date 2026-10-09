@@ -1,0 +1,94 @@
+{
+  "name": "Executive Agent - Employee Lookup Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "employee_id"
+            },
+            {
+              "name": "full_name"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "3798558c-dc22-4b87-8091-da9b1209b6f8",
+      "name": "Receive Employee Lookup Request"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "buJFFUxcqVzpbhFb",
+          "mode": "list",
+          "cachedResultName": "executive_agent_employees"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -64
+      ],
+      "id": "22628c73-2a7a-4673-b63e-5940ca3dacf9",
+      "name": "Retrieve Employees from Database"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst employees = $input.all().map(item => item.json);\n\nconst request = $('Receive Employee Lookup Request').first().json;\n\nconst employeeId = String(request.employee_id ?? '')\n  .trim().toLowerCase();\n\nconst fullName = String(request.full_name ?? '')\n  .trim().toLowerCase();\n\nconst filtered = employees.filter(employee => {\n  const matchesId = !employeeId ||\n    String(employee.employee_id ?? '')\n      .toLowerCase() === employeeId;\n\n  const matchesName = !fullName ||\n    String(employee.full_name ?? '')\n      .toLowerCase().includes(fullName);\n\n  return matchesId && matchesName;\n});\n\nreturn [{\n  json: {\n    success: true,\n    total: filtered.length,\n    filters: {\n      employee_id: employeeId || null,\n      full_name: fullName || null\n    },\n    employees: filtered.map(employee => ({\n      employee_id: employee.employee_id,\n      full_name: employee.full_name,\n      department: employee.department,\n      email: employee.email,\n      role: employee.role,\n      active: employee.active\n    }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -64
+      ],
+      "id": "020b7d5c-6021-4045-a742-258cd8c5f750",
+      "name": "Filter and Format Employee Results"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Employee Lookup Request": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Employees from Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Employees from Database": {
+      "main": [
+        [
+          {
+            "node": "Filter and Format Employee Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b251d56c-b97a-47c4-96d9-a55e4565314a",
+  "nodeGroups": [],
+  "id": "gnsseUOxCmYTpEVK",
+  "tags": []
+}
